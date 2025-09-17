@@ -1,6 +1,6 @@
-# moblink - MQTT Link for Mobilus Cosmo GTW
+# 🔗 moblink
 
-A lightweight bridge that links the **Mobilus Cosmo GTW** and a target MQTT broker. It subscribes to MQTT topics on the GTW and publishes them into a standard MQTT structure, making integration with external systems (e.g. Loxberry, Home Automation platforms) much easier.
+A lightweight bridge that links the **Mobilus Cosmo GTW** and a target MQTT broker. It subscribes to MQTT topics on the **Cosmo GTW** and publishes them into a standard MQTT structure, making integration with external systems (e.g. Loxberry, Home Automation platforms) much easier.
 
 ## Requirements
 
@@ -21,6 +21,8 @@ The **moblink** operates on 4 MQTT topics.
 **Publish topics:**
 
 * `devices/{deviceId}/command` — for sending commands to a specific device
+
+> {deviceId} is an integer assinged by the Cosmo GTW
 
 ## Usage
 
