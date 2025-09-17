@@ -1,0 +1,14 @@
+[Unit]
+Description=MQTT Link for Mobilus Cosmo GTW
+After=network.target
+
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+ExecStart=/usr/local/bin/moblink
+EnvironmentFile=/etc/moblink.conf
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

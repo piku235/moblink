@@ -1,0 +1,3 @@
+#pragma once
+
+constexpr char kMobilusCacert[] = R"(@MOBILUS_CACERT@)";
