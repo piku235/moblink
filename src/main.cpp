@@ -56,7 +56,6 @@ void handleStopSignal(int)
     try {
         gStop.set_value();
     } catch (const std::future_error& err) {
-        std::cerr << err.what() << std::endl;
         // ignore
     }
 }
