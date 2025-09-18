@@ -4,7 +4,6 @@ A lightweight bridge that links the **Mobilus Cosmo GTW** and a target MQTT brok
 
 ## Requirements
 
-* C++17 compatible compiler (GCC 8+, Clang 7+)
 * OpenSSL v3
 * Mosquitto v2.x (v1.x optionally supported)
 
