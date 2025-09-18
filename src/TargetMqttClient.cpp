@@ -8,7 +8,7 @@ using namespace jungi::mobilus_gtw_client;
 static constexpr char kDeviceStateTopic[] = "devices/%ld/state";
 static constexpr char kDeviceErrorTopic[] = "devices/%ld/error";
 static constexpr char kDeviceCommandTopic[] = "devices/%ld/command";
-static constexpr char kDeviceRequestedCommandTopic[] = "devices/%ld/requested-command";
+static constexpr char kDevicePendingCommandTopic[] = "devices/%ld/pending-command";
 static constexpr char kDeviceCommandSubTopic[] = "devices/+/command";
 static constexpr std::chrono::seconds kDelay(1);
 
@@ -103,14 +103,14 @@ void TargetMqttClient::publishDeviceError(long deviceId, const std::string& erro
     mosquitto_publish(mMosq, nullptr, topic, error.size(), error.data(), 0, false);
 }
 
-void TargetMqttClient::publishDeviceRequestedCommand(long deviceId, const std::string& command)
+void TargetMqttClient::publishDevicePendingCommand(long deviceId, const std::string& command)
 {
     if (!mMosq) {
         return;
     }
 
     char topic[64];
-    snprintf(topic, sizeof(topic), kDeviceRequestedCommandTopic, deviceId);
+    snprintf(topic, sizeof(topic), kDevicePendingCommandTopic, deviceId);
 
     mosquitto_publish(mMosq, nullptr, topic, command.size(), command.data(), 0, false);
 }

@@ -36,11 +36,11 @@ void TargetMqttActor::publishDeviceError(long deviceId, std::string error)
     });
 }
 
-void TargetMqttActor::publishDeviceRequestedCommand(long deviceId, std::string command)
+void TargetMqttActor::publishDevicePendingCommand(long deviceId, std::string command)
 {
     post([deviceId, command = std::move(command)](io::EventLoop&, TargetMqttClient& client) {
-        client.publishDeviceRequestedCommand(deviceId, command);
-        std::cout << "Published requested command: " << command << " for device id: " << deviceId << std::endl;
+        client.publishDevicePendingCommand(deviceId, command);
+        std::cout << "Published pending command: " << command << " for device id: " << deviceId << std::endl;
     });
 }
 

@@ -24,7 +24,7 @@ public:
     void pushCommandsTo(MqttMobilusGtwActor* mobGtwMqttActor);
     void publishDeviceState(long deviceId, std::string state);
     void publishDeviceError(long deviceId, std::string error);
-    void publishDeviceRequestedCommand(long deviceId, std::string command);
+    void publishDevicePendingCommand(long deviceId, std::string command);
 
 protected:
     void run() override;

@@ -16,7 +16,7 @@ The **moblink** operates on 4 MQTT topics.
 
 * `devices/{deviceId}/state` — current device state (emitted after a command is executed)
 * `devices/{deviceId}/error`— errors occurred during command execution
-* `devices/{deviceId}/requested-command` — received commands that are pending
+* `devices/{deviceId}/pending-command` — received commands that are pending execution
 
 **Publish topics:**
 

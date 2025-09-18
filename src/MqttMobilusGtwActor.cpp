@@ -70,7 +70,7 @@ void MqttMobilusGtwActor::push(const proto::CallEvents& callEvents)
 
     switch (event.event_number()) {
     case EventNumber::Sent:
-        mTargetMqttActor->publishDeviceRequestedCommand(event.device_id(), event.value());
+        mTargetMqttActor->publishDevicePendingCommand(event.device_id(), event.value());
         break;
     case EventNumber::Reached:
         mTargetMqttActor->publishDeviceState(event.device_id(), event.value());

@@ -28,7 +28,7 @@ public:
     void disconnect();
     void publishDeviceState(long deviceId, const std::string& state);
     void publishDeviceError(long deviceId, const std::string& error);
-    void publishDeviceRequestedCommand(long deviceId, const std::string& command);
+    void publishDevicePendingCommand(long deviceId, const std::string& command);
     void subscribeDeviceCommands(DeviceCommandSubscriber subscriber);
 
     mobgtw::io::SocketEvents socketEvents() override;
