@@ -43,3 +43,7 @@ target_link_libraries(moblink
     OpenSSL::Crypto
     PkgConfig::MOSQUITTO
 )
+
+install(TARGETS moblink
+  RUNTIME DESTINATION bin
+)
