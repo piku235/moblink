@@ -10,8 +10,6 @@ ExecStart=/usr/local/bin/moblink
 EnvironmentFile=/etc/moblink.conf
 Restart=always
 RestartSec=1
-RestartSteps=10
-RestartMaxDelaySec=120
 
 [Install]
 WantedBy=multi-user.target
