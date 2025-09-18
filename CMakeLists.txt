@@ -11,7 +11,7 @@ pkg_check_modules(MOSQUITTO REQUIRED IMPORTED_TARGET libmosquitto)
 include(FetchContent)
 FetchContent_Declare(
   mobilus_gtw_client
-  URL https://github.com/piku235/mobilus-gtw-client/archive/refs/tags/v0.3.0.zip
+  URL https://github.com/piku235/mobilus-gtw-client/archive/refs/tags/v0.3.1.zip
 )
 FetchContent_MakeAvailable(mobilus_gtw_client)
 
