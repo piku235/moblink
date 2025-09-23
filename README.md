@@ -36,8 +36,8 @@ Run **moblink** by setting environment variables inline:
 | Variable           | Description |
 |--------------------|-------------|
 | `MOBILUS_DSN`      | DSN for Cosmo GTW (`mqtt://` or `mqtts://`) |
-| `MOBILUS_USERNAME` | Username for the Mobilus gateway |
-| `MOBILUS_PASSWORD` | Password for the Mobilus gateway |
+| `MOBILUS_USERNAME` | Username for Cosmo GTW |
+| `MOBILUS_PASSWORD` | Password for Cosmo GTW |
 | `TARGET_DSN`       | DSN for MQTT broker where messages should be published from Cosmo GTW |
 | `ROOT_TOPIC`       | Root MQTT topic that is appended for all topics |
 
