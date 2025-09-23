@@ -27,12 +27,27 @@ You can change the default root topic: `mobilus` to anything else by providing e
 
 ## Basic usage
 
+Run **moblink** by setting environment variables inline:
+
+```bash
+[ENV_VAR=value ...] ./moblink
+
+| Variable           | Description |
+|--------------------|-------------|
+| `MOBILUS_DSN`      | DSN for Cosmo GTW (`mqtt://` or `mqtts://`) |
+| `MOBILUS_USERNAME` | Username for the Mobilus gateway |
+| `MOBILUS_PASSWORD` | Password for the Mobilus gateway |
+| `TARGET_DSN`       | DSN for MQTT broker where messages should be published from Cosmo GTW |
+| `ROOT_TOPIC`       | Root MQTT topic that is appended for all topics |
+
+#### Example
+
 ```bash
 MOBILUS_DSN="mqtts://192.168.1.1:8883?verify=false" \
-MOBILUS_USERNAME=admin \
-MOBILUS_PASSWORD=admin \
+MOBILUS_USERNAME="admin" \
+MOBILUS_PASSWORD="admin" \
 TARGET_DSN="mqtt://127.0.0.1:1883" \
-ROOT_TOPIC=mobilus \
+ROOT_TOPIC="mobilus" \
 ./moblink
 ```
 
