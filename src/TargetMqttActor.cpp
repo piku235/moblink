@@ -9,9 +9,10 @@ using namespace jungi::mobilus_gtw_client;
 
 namespace moblink {
 
-TargetMqttActor::TargetMqttActor(MqttDsn dsn, std::promise<void>& onFinished)
+TargetMqttActor::TargetMqttActor(MqttDsn dsn, std::optional<std::string> rootTopic, std::promise<void>& onFinished)
     : BaseActor(onFinished)
     , mDsn(std::move(dsn))
+    , mRootTopic(std::move(rootTopic))
 {
 }
 
@@ -48,6 +49,10 @@ void TargetMqttActor::run()
 {
     io::SelectEventLoop loop;
     TargetMqttClient client(std::move(mDsn), loop);
+
+    if (mRootTopic) {
+        client.setRootTopic(std::move(*mRootTopic));
+    }
 
     client.subscribeDeviceCommands([this](long deviceId, std::string command) { push(deviceId, std::move(command)); });
 

@@ -66,6 +66,7 @@ int main()
     auto targetDsn = mqttDsnFrom("TARGET_DSN");
     auto mobilusUsername = getenv("MOBILUS_USERNAME");
     auto mobilusPassword = getenv("MOBILUS_PASSWORD");
+    auto rootTopic = getenv("ROOT_TOPIC");
 
     if (!mobilusDsn) {
         std::cerr << "MOBILUS_DSN is missing or malformed" << std::endl;
@@ -80,7 +81,7 @@ int main()
     applyMobilusCacert(*mobilusDsn);
 
     MqttMobilusGtwActor mobilusGtwActor(*mobilusDsn, { nullptr != mobilusUsername ? mobilusUsername : "admin", nullptr != mobilusPassword ? mobilusPassword : "admin" }, gStop);
-    TargetMqttActor targetMqttActor(*targetDsn, gStop);
+    TargetMqttActor targetMqttActor(*targetDsn, nullptr != rootTopic ? std::optional(rootTopic) : std::nullopt, gStop);
 
     mobilusGtwActor.pushEventsTo(&targetMqttActor);
     targetMqttActor.pushCommandsTo(&mobilusGtwActor);

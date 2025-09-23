@@ -10,6 +10,7 @@
 #include <queue>
 #include <mutex>
 #include <memory>
+#include <optional>
 
 namespace moblink {
 
@@ -19,7 +20,7 @@ class TargetMqttActor final : public Actor<TargetMqttClient> {
 public:
     using BaseActor = Actor<TargetMqttClient>;
     
-    TargetMqttActor(jungi::mobilus_gtw_client::MqttDsn dsn, std::promise<void>& onFinished = BaseActor::defaultFinishedPromise);
+    TargetMqttActor(jungi::mobilus_gtw_client::MqttDsn dsn, std::optional<std::string> rootTopic = std::nullopt, std::promise<void>& onFinished = BaseActor::defaultFinishedPromise);
 
     void pushCommandsTo(MqttMobilusGtwActor* mobGtwMqttActor);
     void publishDeviceState(long deviceId, std::string state);
@@ -31,6 +32,7 @@ protected:
 
 private:
     jungi::mobilus_gtw_client::MqttDsn mDsn;
+    std::optional<std::string> mRootTopic;
     MqttMobilusGtwActor* mMobGtwMqttActor = nullptr;
 
     void push(long deviceId, std::string command);

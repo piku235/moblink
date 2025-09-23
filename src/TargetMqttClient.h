@@ -26,6 +26,7 @@ public:
 
     bool connect();
     void disconnect();
+    void setRootTopic(std::string rootTopic);
     void publishDeviceState(long deviceId, const std::string& state);
     void publishDeviceError(long deviceId, const std::string& error);
     void publishDevicePendingCommand(long deviceId, const std::string& command);
@@ -40,6 +41,7 @@ private:
     mobgtw::MqttDsn mDsn;
     mobgtw::io::EventLoop& mLoop;
     mobgtw::io::EventLoop::TimerId mMiscTimerId = mobgtw::io::EventLoop::kInvalidTimerId;
+    std::string mRootTopic = "mobilus";
     DeviceCommandSubscriber mDeviceCommandSubscriber = [](long, const std::string&) {};
 
     static void onMessageCallback(mosquitto* mosq, void* obj, const mosquitto_message* message) { reinterpret_cast<TargetMqttClient*>(obj)->onMessage(message); }
@@ -47,6 +49,8 @@ private:
 
     void onMessage(const mosquitto_message* message);
     void handleMisc();
+    std::string buildTopic(const char* topic);
+    std::string formatTopic(const char* format, ...);
 };
 
 }

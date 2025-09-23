@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstdio>
+#include <cstdarg>
 
 using namespace jungi::mobilus_gtw_client;
 
@@ -56,7 +57,7 @@ bool TargetMqttClient::connect()
         return false;
     }
 
-    if (MOSQ_ERR_SUCCESS != mosquitto_subscribe(mMosq, nullptr, kDeviceCommandSubTopic, 0)) {
+    if (MOSQ_ERR_SUCCESS != mosquitto_subscribe(mMosq, nullptr, buildTopic(kDeviceCommandSubTopic).c_str(), 0)) {
         mosquitto_disconnect(mMosq);
         return false;
     }
@@ -79,16 +80,22 @@ void TargetMqttClient::disconnect()
     }
 }
 
+void TargetMqttClient::setRootTopic(std::string rootTopic)
+{
+    if (nullptr != mMosq) {
+        return;
+    }
+
+    mRootTopic = std::move(rootTopic);
+}
+
 void TargetMqttClient::publishDeviceState(long deviceId, const std::string& state)
 {
     if (!mMosq) {
         return;
     }
-    
-    char topic[64];
-    snprintf(topic, sizeof(topic), kDeviceStateTopic, deviceId);
 
-    mosquitto_publish(mMosq, nullptr, topic, state.size(), state.data(), 0, false);
+    mosquitto_publish(mMosq, nullptr, formatTopic(kDeviceStateTopic, deviceId).c_str(), state.size(), state.data(), 0, false);
 }
 
 void TargetMqttClient::publishDeviceError(long deviceId, const std::string& error)
@@ -96,11 +103,8 @@ void TargetMqttClient::publishDeviceError(long deviceId, const std::string& erro
     if (!mMosq) {
         return;
     }
-    
-    char topic[64];
-    snprintf(topic, sizeof(topic), kDeviceErrorTopic, deviceId);
 
-    mosquitto_publish(mMosq, nullptr, topic, error.size(), error.data(), 0, false);
+    mosquitto_publish(mMosq, nullptr, formatTopic(kDeviceErrorTopic, deviceId).c_str(), error.size(), error.data(), 0, false);
 }
 
 void TargetMqttClient::publishDevicePendingCommand(long deviceId, const std::string& command)
@@ -109,10 +113,7 @@ void TargetMqttClient::publishDevicePendingCommand(long deviceId, const std::str
         return;
     }
 
-    char topic[64];
-    snprintf(topic, sizeof(topic), kDevicePendingCommandTopic, deviceId);
-
-    mosquitto_publish(mMosq, nullptr, topic, command.size(), command.data(), 0, false);
+    mosquitto_publish(mMosq, nullptr, formatTopic(kDevicePendingCommandTopic, deviceId).c_str(), command.size(), command.data(), 0, false);
 }
 
 void TargetMqttClient::subscribeDeviceCommands(DeviceCommandSubscriber subscriber)
@@ -178,10 +179,33 @@ void TargetMqttClient::handleMisc()
 void TargetMqttClient::onMessage(const mosquitto_message* message)
 {
     long deviceId;
-        
-    if (sscanf(message->topic, kDeviceCommandTopic, &deviceId) > 0) {
+
+    if (sscanf(message->topic, buildTopic(kDeviceCommandTopic).c_str(), &deviceId) > 0) {
         mDeviceCommandSubscriber(deviceId, std::string(reinterpret_cast<const char*>(message->payload), message->payloadlen));
     }
+}
+
+std::string TargetMqttClient::buildTopic(const char* topic)
+{
+    std::string builtTopic;
+
+    builtTopic.append(mRootTopic);
+    builtTopic.append("/");
+    builtTopic.append(topic);
+
+    return builtTopic;
+}
+
+std::string TargetMqttClient::formatTopic(const char* format, ...)
+{
+    char formattedTopic[64];
+
+    va_list args;
+    va_start(args, format);
+    vsnprintf(formattedTopic, sizeof(formattedTopic), format, args);
+    va_end(args);
+
+    return buildTopic(formattedTopic);
 }
 
 }
