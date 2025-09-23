@@ -13,20 +13,39 @@ The **moblink** operates on 4 MQTT topics.
 
 **Subscription topics:**
 
-* `devices/{deviceId}/state` — current device state (emitted after a command is executed)
-* `devices/{deviceId}/error`— errors occurred during command execution
-* `devices/{deviceId}/pending-command` — received commands that are pending execution
+* `mobilus/devices/{deviceId}/state` — current device state (emitted after a command is executed)
+* `mobilus/devices/{deviceId}/error`— errors occurred during command execution
+* `mobilus/devices/{deviceId}/pending-command` — received commands that are pending execution
 
 **Publish topics:**
 
-* `devices/{deviceId}/command` — for sending commands to a specific device
+* `mobilus/devices/{deviceId}/command` — for sending commands to a specific device
 
 > {deviceId} is an integer assinged by the Cosmo GTW
 
-## Usage
+You can change the default root topic: `mobilus` to anything else by providing env `ROOT_TOPIC`.
+
+## Basic usage
 
 ```bash
-MOBILUS_DSN="mqtts://192.168.1.1" MOBILUS_USERNAME=admin MOBILUS_PASSWORD=admin TARGET_DSN="mqtt://127.0.0.1:1883" ./moblink
+MOBILUS_DSN="mqtts://192.168.1.1:8883?verify=false" \
+MOBILUS_USERNAME=admin \
+MOBILUS_PASSWORD=admin \
+TARGET_DSN="mqtt://127.0.0.1:1883" \
+ROOT_TOPIC=mobilus
+./moblink
+```
+
+### Systemd
+
+You can easily set up **moblink** to start automatically using **systemd**, which is available on most Linux distributions.
+
+```bash
+sudo install -m 644 ./etc/moblink.conf /etc/
+sudo install -m 644 ./systemd/moblink.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable moblink
+sudo systemctl start moblink
 ```
 
 ## Build
