@@ -91,7 +91,7 @@ void TargetMqttClient::setRootTopic(std::string rootTopic)
 
 void TargetMqttClient::publishDeviceState(long deviceId, const std::string& state)
 {
-    if (!mMosq) {
+    if (!mConnected) {
         return;
     }
 
@@ -100,7 +100,7 @@ void TargetMqttClient::publishDeviceState(long deviceId, const std::string& stat
 
 void TargetMqttClient::publishDeviceError(long deviceId, const std::string& error)
 {
-    if (!mMosq) {
+    if (!mConnected) {
         return;
     }
 
@@ -109,7 +109,7 @@ void TargetMqttClient::publishDeviceError(long deviceId, const std::string& erro
 
 void TargetMqttClient::publishDevicePendingCommand(long deviceId, const std::string& command)
 {
-    if (!mMosq) {
+    if (!mConnected) {
         return;
     }
 
@@ -123,7 +123,7 @@ void TargetMqttClient::subscribeDeviceCommands(DeviceCommandSubscriber subscribe
 
 mobgtw::io::SocketEvents TargetMqttClient::socketEvents()
 {
-    if (!mMosq) {
+    if (!mConnected) {
         return {};
     }
 
@@ -139,7 +139,7 @@ mobgtw::io::SocketEvents TargetMqttClient::socketEvents()
 
 void TargetMqttClient::handleSocketEvents(mobgtw::io::SocketEvents revents)
 {
-    if (!mMosq) {
+    if (!mConnected) {
         return;
     }
 
@@ -163,7 +163,7 @@ void TargetMqttClient::handleSocketEvents(mobgtw::io::SocketEvents revents)
 
 void TargetMqttClient::handleMisc() 
 {
-    if (!mMosq) {
+    if (!mConnected) {
         return;
     }
 
