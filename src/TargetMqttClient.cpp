@@ -37,13 +37,11 @@ bool TargetMqttClient::connect()
         return true;
     }
 
-    mMosq = mosquitto_new(nullptr, true, this);
+    mMosq = mosquitto_new(nullptr, true, nullptr);
 
     if (nullptr == mMosq) {
         return false;
     }
-
-    mosquitto_message_callback_set(mMosq, onMessageCallback);
 
     if (mDsn.secure) {
         if (MOSQ_ERR_SUCCESS != mosquitto_tls_set(mMosq, mDsn.cacert ? mDsn.cacert->c_str() : nullptr, nullptr, nullptr, nullptr, nullptr)) {
@@ -53,9 +51,34 @@ bool TargetMqttClient::connect()
         mosquitto_tls_insecure_set(mMosq, mDsn.verify.value_or(true) ? false : true);
     }
 
+    if (MOSQ_ERR_SUCCESS != mosquitto_username_pw_set(mMosq, mDsn.username ? (*mDsn.username).c_str() : nullptr, mDsn.password ? (*mDsn.password).c_str() : nullptr)) {
+        return false;
+    }
+
+    int connectRc = -1;
+    mosquitto_user_data_set(mMosq, &connectRc);
+
+    mosquitto_message_callback_set(mMosq, onMessageCallback);
+    mosquitto_connect_callback_set(mMosq, [](mosquitto*, void* obj, int rc) {
+        auto connectRc = reinterpret_cast<int*>(obj);
+        *connectRc = rc;
+    });
+
     if (MOSQ_ERR_SUCCESS != mosquitto_connect(mMosq, mDsn.host.c_str(), *mDsn.port, 60)) {
         return false;
     }
+
+    while (connectRc < MOSQ_ERR_SUCCESS) {
+        if (MOSQ_ERR_SUCCESS != mosquitto_loop(mMosq, 1000, 1)) {
+            break;
+        }
+    }
+
+    if (MOSQ_ERR_SUCCESS != connectRc) {
+        return false;
+    }
+
+    mosquitto_user_data_set(mMosq, this);
 
     if (MOSQ_ERR_SUCCESS != mosquitto_subscribe(mMosq, nullptr, buildTopic(kDeviceCommandSubTopic).c_str(), 0)) {
         mosquitto_disconnect(mMosq);
