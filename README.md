@@ -31,6 +31,7 @@ Run **moblink** by setting environment variables inline:
 
 ```bash
 [ENV_VAR=value ...] ./moblink
+```
 
 | Variable           | Description |
 |--------------------|-------------|
