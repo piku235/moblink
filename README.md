@@ -32,7 +32,7 @@ MOBILUS_DSN="mqtts://192.168.1.1:8883?verify=false" \
 MOBILUS_USERNAME=admin \
 MOBILUS_PASSWORD=admin \
 TARGET_DSN="mqtt://127.0.0.1:1883" \
-ROOT_TOPIC=mobilus
+ROOT_TOPIC=mobilus \
 ./moblink
 ```
 
