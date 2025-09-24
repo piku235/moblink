@@ -1,7 +1,8 @@
+#include "mobilus_cert.h"
 #include "MqttMobilusGtwActor.h"
 #include "TargetMqttActor.h"
-#include "filesystem/TempFile.h"
-#include "MobilusCacert.h"
+
+#include <filesystem/TempFile.h>
 
 #include <future>
 #include <iostream>
@@ -11,21 +12,21 @@
 #include <csignal>
 
 using namespace moblink;
-using namespace moblink::filesystem;
 using namespace jungi::mobilus_gtw_client;
+using filesystem::TempFile;
 
-TempFile loadMobilusCa()
+TempFile loadMobilusCaCert()
 {
     auto tempFile = TempFile::unique("/tmp/mobilus_ca_XXXXXX");
-    tempFile.write(kMobilusCacert, sizeof(kMobilusCacert));
+    tempFile.write(kMobilusCaCert, sizeof(kMobilusCaCert));
 
     return tempFile;
 }
 
-auto applyMobilusCacert(MqttDsn& dsn)
+auto applyMobilusCaCert(MqttDsn& dsn)
 {
     if (dsn.secure && !dsn.cacert) {
-        static auto cacert = loadMobilusCa();
+        static auto cacert = loadMobilusCaCert();
         dsn.cacert = cacert.path();
     }
 
@@ -78,7 +79,7 @@ int main()
         return 1;
     }
 
-    applyMobilusCacert(*mobilusDsn);
+    applyMobilusCaCert(*mobilusDsn);
 
     MqttMobilusGtwActor mobilusGtwActor(*mobilusDsn, { nullptr != mobilusUsername ? mobilusUsername : "admin", nullptr != mobilusPassword ? mobilusPassword : "admin" }, gStop);
     TargetMqttActor targetMqttActor(*targetDsn, nullptr != rootTopic ? std::optional(rootTopic) : std::nullopt, gStop);

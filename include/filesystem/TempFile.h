@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <utility>
 
-namespace moblink::filesystem {
+namespace filesystem {
 
 class TempFile final {
 public:
@@ -31,7 +31,7 @@ public:
     TempFile& operator=(TempFile&& other) = delete;
 
     void write(const char* buf, size_t size) { ::write(mFd, buf, size); }
-    const std::string path() const { return mPath; }
+    const std::string& path() const { return mPath; }
 
 private:
     static constexpr int kInvalidFd = -1;

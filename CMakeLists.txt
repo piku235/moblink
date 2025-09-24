@@ -19,8 +19,8 @@ set(MOBILUS_CACERT_FILE "${mobilus_gtw_client_SOURCE_DIR}/certs/mobilelabs_mobil
 file(READ "${MOBILUS_CACERT_FILE}" MOBILUS_CACERT)
 
 configure_file(
-  src/MobilusCacert.h.in
-  "${CMAKE_BINARY_DIR}/src/MobilusCacert.h"
+  src/mobilus_cert.h.in
+  "${CMAKE_BINARY_DIR}/src/mobilus_cert.h"
   @ONLY
 )
 
@@ -33,6 +33,7 @@ add_executable(moblink
 
 target_include_directories(moblink
   PRIVATE
+    include
     ${CMAKE_BINARY_DIR}/src
 )
 
