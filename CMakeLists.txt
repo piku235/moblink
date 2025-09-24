@@ -25,7 +25,6 @@ configure_file(
 )
 
 add_executable(moblink
-  src/filesystem/TempFile.cpp
   src/MqttMobilusGtwActor.cpp
   src/TargetMqttActor.cpp
   src/TargetMqttClient.cpp
