@@ -33,22 +33,26 @@ auto applyMobilusCaCert(MqttDsn& dsn)
     return dsn;
 }
 
-std::optional<MqttDsn> mqttDsnFrom(const char* env)
+std::optional<std::string> envFrom(const char* env)
 {
     const auto value = getenv(env);
 
-    if (nullptr == value) {
-        return std::nullopt;
-    }
+    return nullptr != value ? std::optional(value) : std::nullopt;
+}
 
-    const auto dsn = MqttDsn::from(value);
+std::optional<MqttDsn> mqttDsnFrom(const char* env)
+{
+    auto r = envFrom(env);
 
-    if (!dsn) {
-        return std::nullopt;
-    }
+    return r ? MqttDsn::from(*r) : std::nullopt;
+}
+
+const MqttDsn kDefaultMobilusDsn = []() {
+    auto dsn = MqttDsn::from("mqtts://mobilus:8883").value();
+    applyMobilusCaCert(dsn);
 
     return dsn;
-}
+}();
 
 std::promise<void> gStop;
 
@@ -63,26 +67,16 @@ void handleStopSignal(int)
 
 int main()
 {
-    auto mobilusDsn = mqttDsnFrom("MOBILUS_DSN");
-    auto targetDsn = mqttDsnFrom("TARGET_DSN");
-    auto mobilusUsername = getenv("MOBILUS_USERNAME");
-    auto mobilusPassword = getenv("MOBILUS_PASSWORD");
-    auto rootTopic = getenv("ROOT_TOPIC");
+    auto mobilusDsn = mqttDsnFrom("MOBILUS_DSN").value_or(kDefaultMobilusDsn);
+    auto targetDsn = mqttDsnFrom("TARGET_DSN").value_or(kDefaultMobilusDsn);
+    auto mobilusUsername = envFrom("MOBILUS_USERNAME").value_or("admin");
+    auto mobilusPassword = envFrom("MOBILUS_PASSWORD").value_or("admin");
+    auto rootTopic = envFrom("ROOT_TOPIC");
 
-    if (!mobilusDsn) {
-        std::cerr << "MOBILUS_DSN is missing or malformed" << std::endl;
-        return 1;
-    }
+    applyMobilusCaCert(mobilusDsn);
 
-    if (!targetDsn) {
-        std::cerr << "TARGET_DSN is missing or malformed" << std::endl;
-        return 1;
-    }
-
-    applyMobilusCaCert(*mobilusDsn);
-
-    MqttMobilusGtwActor mobilusGtwActor(*mobilusDsn, { nullptr != mobilusUsername ? mobilusUsername : "admin", nullptr != mobilusPassword ? mobilusPassword : "admin" }, gStop);
-    TargetMqttActor targetMqttActor(*targetDsn, nullptr != rootTopic ? std::optional(rootTopic) : std::nullopt, gStop);
+    MqttMobilusGtwActor mobilusGtwActor(std::move(mobilusDsn), { std::move(mobilusUsername), std::move(mobilusPassword) }, gStop);
+    TargetMqttActor targetMqttActor(std::move(targetDsn), std::move(rootTopic), gStop);
 
     mobilusGtwActor.pushEventsTo(&targetMqttActor);
     targetMqttActor.pushCommandsTo(&mobilusGtwActor);
