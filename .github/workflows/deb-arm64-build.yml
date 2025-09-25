@@ -1,0 +1,63 @@
+name: Debian Package arm64 Build
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Common strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "sysroot-dir=${{ github.workspace }}/sysroot" >> "$GITHUB_OUTPUT"
+
+    - name: Install dependencies on host
+      run: sudo apt-get update && sudo apt-get install -y qemu-user-static binfmt-support debootstrap build-essential gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+    - name: Bootstrap Debian arm64
+      run: |
+        mkdir -p ${{ steps.strings.outputs.sysroot-dir }}
+        sudo debootstrap --arch=arm64 --foreign --variant=minbase bookworm ${{ steps.strings.outputs.sysroot-dir }} http://deb.debian.org/debian
+        sudo cp /usr/bin/qemu-aarch64-static ${{ steps.strings.outputs.sysroot-dir }}/usr/bin/
+        sudo chroot ${{ steps.strings.outputs.sysroot-dir }} /debootstrap/debootstrap --second-stage
+
+    - name: Install dependencies on sysroot
+      run: |
+        sudo chroot ${{ steps.strings.outputs.sysroot-dir }} apt-get update
+        sudo chroot ${{ steps.strings.outputs.sysroot-dir }} apt-get install -y libmosquitto-dev libssl-dev
+
+    - name: Configure CMake
+      run: cmake
+        -B ${{ steps.strings.outputs.build-dir }}
+        -S ${{ github.workspace }}
+        -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=arm64
+        -DCMAKE_SYSROOT=${{ steps.strings.outputs.sysroot-dir }}
+        -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/arm64.cmake
+        -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-dir }}
+
+    - name: CPack
+      id: cpack
+      working-directory: ${{ steps.strings.outputs.build-dir }}
+      run: |
+        DEB=$(cpack -G DEB 2>&1 | awk '/CPack: - package:/ {print $4}')
+        echo "deb=$DEB"
+
+    - name: Upload
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ${{ steps.strings.outputs.exec }}
+          ${{ steps.cpack.outputs.deb }}

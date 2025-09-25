@@ -1,0 +1,48 @@
+name: Debian Package amd64 Build
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Common strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libmosquitto-dev libssl-dev
+
+    - name: Configure CMake
+      run: cmake \
+        -B ${{ steps.strings.outputs.build-dir }} \
+        -S ${{ github.workspace }} \
+        -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=arm64 \
+        -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-dir }}
+
+    - name: CPack
+      id: cpack
+      working-directory: ${{ steps.strings.outputs.build-dir }}
+      run: |
+        DEB=$(cpack -G DEB 2>&1 | awk '/CPack: - package:/ {print $4}')
+        echo "deb=$DEB"
+
+    - name: Upload
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ${{ steps.strings.outputs.exec }}
+          ${{ steps.cpack.outputs.deb }}
