@@ -53,11 +53,9 @@ jobs:
       working-directory: ${{ steps.strings.outputs.build-dir }}
       run: |
         DEB=$(cpack -G DEB 2>&1 | awk '/CPack: - package:/ {print $4}')
-        echo "deb=$DEB"
+        echo "deb=$DEB" >> "$GITHUB_OUTPUT"
 
     - name: Upload
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          ${{ steps.strings.outputs.exec }}
-          ${{ steps.cpack.outputs.deb }}
+        files: ${{ steps.cpack.outputs.deb }}
