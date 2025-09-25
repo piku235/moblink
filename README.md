@@ -44,7 +44,7 @@ Run **moblink** by setting environment variables inline:
 #### Example
 
 ```bash
-MOBILUS_DSN="mqtts://192.168.1.1:8883?verify=false" \
+MOBILUS_DSN="mqtts://mobilus:8883" \
 MOBILUS_USERNAME="admin" \
 MOBILUS_PASSWORD="admin" \
 TARGET_DSN="mqtt://127.0.0.1:1883" \
@@ -52,16 +52,52 @@ ROOT_TOPIC="mobilus" \
 ./moblink
 ```
 
-### Systemd
+## Installation
 
-You can easily set up **moblink** to start automatically using **systemd**, which is available on most Linux distributions.
+### Automated (Debian)
+
+Download the latest **moblink-*.deb** from the **Releases** and install it:
 
 ```bash
-sudo install -m 644 ./etc/moblink.conf /etc/
-sudo install -m 644 ./systemd/moblink.service /etc/systemd/system/
+sudo apt install ./moblink-*.deb
+```
+
+Adjust config parameters in `/etc/moblink.conf`.
+
+Restart:
+
+```bash
+sudo systemctl restart moblink
+```
+
+And verify that it's running:
+
+```bash
+sudo systemctl status moblink
+```
+
+### Manual (other with systemd)
+
+For other Linux distro supporting **systemd** you can setup **moblink** manually by downloading **moblink-linux.tar.gz** in **Releases** and copy:
+
+```bash
+sudo cp moblink.conf /etc/moblink.conf
+sudo cp moblink.service /lib/systemd/system/moblink.service
+sudo cp moblink /usr/bin/moblink
+```
+
+Then, enable the **moblink** service and start it:
+
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable moblink
 sudo systemctl start moblink
+```
+
+And verify that it's running:
+
+```bash
+sudo systemctl status moblink
 ```
 
 ## Build
@@ -71,7 +107,6 @@ This project uses **CMake** as its build system.
 To build the project:
 
 ```bash
-mkdir build && cd build
-cmake ..
-cmake --build .
+cmake -B build
+cmake --build build
 ```
