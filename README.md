@@ -62,7 +62,7 @@ Download the latest **moblink-*.deb** from the **Releases** and install it:
 sudo apt install ./moblink-*.deb
 ```
 
-Adjust config parameters in `/etc/moblink.conf`.
+Adjust config parameters in `/etc/moblink.conf`
 
 Restart:
 
@@ -78,7 +78,7 @@ sudo systemctl status moblink
 
 ### Manual (other with systemd)
 
-For other Linux distro supporting **systemd** you can setup **moblink** manually by downloading **moblink-linux.tar.gz** in **Releases** and copy:
+Download **moblink-linux.tar.gz** from the **Releases** page and copy the files:
 
 ```bash
 sudo cp moblink.conf /etc/moblink.conf
