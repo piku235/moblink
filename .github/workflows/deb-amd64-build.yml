@@ -27,7 +27,7 @@ jobs:
       run: cmake
         -B ${{ steps.strings.outputs.build-dir }}
         -S ${{ github.workspace }}
-        -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=arm64
+        -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64
         -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
