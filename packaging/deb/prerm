@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+systemctl stop moblink || true
+systemctl disable moblink || true
+systemctl daemon-reload || true
+
+exit 0
