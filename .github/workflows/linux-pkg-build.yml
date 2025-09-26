@@ -1,0 +1,42 @@
+name: Linux Package Build
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Common strings
+      id: strings
+      shell: bash
+      run: |
+        echo "build-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libmosquitto-dev libssl-dev
+
+    - name: Configure CMake
+      run: cmake -DCMAKE_BUILD_TYPE=Release -B ${{ steps.strings.outputs.build-dir }} -S ${{ github.workspace }}
+
+    - name: Build
+      run: cmake --build ${{ steps.strings.outputs.build-dir }}
+
+    - name: CPack
+      id: cpack
+      working-directory: ${{ steps.strings.outputs.build-dir }}
+      run: |
+        TGZ=$(cpack -G TGZ 2>&1 | awk '/CPack: - package:/ {print $4}')
+        echo "tgz=$TGZ" >> "$GITHUB_OUTPUT"
+
+    - name: Upload
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.cpack.outputs.tgz }}

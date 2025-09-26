@@ -27,7 +27,8 @@ You can change the default root topic: `mobilus` to anything else by providing e
 
 ## Basic usage
 
-Run **moblink** by setting environment variables inline:
+By default, if no ENV vars are set, **moblink** connects to the Cosmo GTW Mosquitto broker and publishes translated messages to the corresponding topics. 
+You can change this behavior by setting the appropriate ENV vars.
 
 ```bash
 [ENV_VAR=value ...] ./moblink
@@ -78,12 +79,11 @@ sudo systemctl status moblink
 
 ### Manual (other with systemd)
 
-Download **moblink-linux.tar.gz** from the **Releases** page and copy the files:
+Download **moblink-Linux.tar.gz** from the **Releases** page and copy the files inside the package on your filesystem.
 
 ```bash
-sudo cp moblink.conf /etc/moblink.conf
-sudo cp moblink.service /lib/systemd/system/moblink.service
-sudo cp moblink /usr/bin/moblink
+tar -xzvf moblink-Linux.tar.gz
+cd moblink-Linux
 ```
 
 Then, enable the **moblink** service and start it:
