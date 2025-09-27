@@ -7,7 +7,7 @@ StartLimitBurst=3
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/moblink
+ExecStart=/usr/local/bin/moblink
 EnvironmentFile=/etc/moblink.conf
 Restart=on-failure
 RestartSec=1
