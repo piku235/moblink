@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+echo "Stopping and disabling service"
+/etc/init.d/moblink stop moblink || true
+/etc/init.d/moblink disable moblink || true
+
+exit 0

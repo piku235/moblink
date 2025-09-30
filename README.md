@@ -77,6 +77,36 @@ And verify that it's running:
 sudo systemctl status moblink
 ```
 
+### Automated (Cosmo GTW)
+
+Installation is performed on the Cosmo GTW via SSH. How to enable SSH access, you'll find [here](https://forum.arturhome.pl/t/aktywacja-ssh-dla-mobilus-cosmo-gtw/15325).
+
+Once you login via SSH, you need to download and install the [**runtime**](https://github.com/piku235/mobilus-gtw-runtime) by running:
+
+```bash
+cd /tmp && wget --no-check-certificate https://raw.githubusercontent.com/piku235/mobilus-gtw-runtime/main/install.sh
+chmod a+x install.sh
+./install.sh
+```
+
+Then, you can install the **moblink** with this simple command:
+
+```bash
+/opt/jungi/scripts/pkg install moblink
+```
+
+Adjust config parameters in `/opt/jungi/etc/moblink.conf` and start the service:
+
+```bash
+/etc/init.d/moblink start
+```
+
+You can inspect its logs by running:
+
+```bash
+logread -e moblink
+```
+
 ### Manual (other with systemd)
 
 Download **moblink-Linux.tar.gz** from the **Releases** page and copy the files inside the package on your filesystem.
