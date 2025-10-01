@@ -1,8 +1,10 @@
 #!/bin/sh
 set -e
 
-echo "Stopping and disabling service"
-/etc/init.d/moblink stop moblink || true
-/etc/init.d/moblink disable moblink || true
+echo "Stopping service"
+/etc/init.d/moblink stop || true
+
+echo "Disabling service"
+/etc/init.d/moblink disable || true
 
 exit 0

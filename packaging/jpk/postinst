@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-CONF=$RUNTIME_DIR/etc/moblink.conf
-
 echo "Enabling service"
-/etc/init.d/moblink enable moblink || true
+/etc/init.d/moblink enable || true
 
-echo "Adjust config $CONF and /etc/init.d/moblink start"
+echo "Starting service"
+/etc/init.d/moblink restart || true
+
 exit 0
