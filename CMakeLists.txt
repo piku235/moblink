@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(moblink VERSION 0.2.0)
+project(moblink VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -59,8 +59,8 @@ set(CPACK_DEBIAN_PACKAGE_DEPENDS "libmosquitto1, libssl3")
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/packaging/deb/postinst;${CMAKE_CURRENT_SOURCE_DIR}/packaging/deb/prerm;${CMAKE_CURRENT_SOURCE_DIR}/packaging/deb/conffiles")
 
 install(TARGETS moblink RUNTIME DESTINATION bin)
-install(FILES packaging/deb/moblink.conf DESTINATION /etc)
-install(FILES packaging/deb/moblink.service DESTINATION /lib/systemd/system)
+install(FILES packaging/common/moblink.conf DESTINATION /etc)
+install(FILES packaging/common/moblink.service DESTINATION /lib/systemd/system)
 
 set(CPACK_STRIP_FILES TRUE)
 set(CPACK_SET_DESTDIR ON)

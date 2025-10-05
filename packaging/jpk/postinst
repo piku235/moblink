@@ -5,6 +5,6 @@ echo "Enabling service"
 /etc/init.d/moblink enable || true
 
 echo "Starting service"
-/etc/init.d/moblink restart || true
+/etc/init.d/moblink restart 2>/dev/null || true
 
 exit 0

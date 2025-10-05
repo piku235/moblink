@@ -2,7 +2,7 @@
 set -e
 
 echo "Stopping service"
-/etc/init.d/moblink stop || true
+/etc/init.d/moblink stop 2>/dev/null || true
 
 echo "Disabling service"
 /etc/init.d/moblink disable || true

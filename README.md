@@ -84,15 +84,13 @@ Installation is performed on the Cosmo GTW via SSH. How to enable SSH access, yo
 Once you login via SSH, you need to download and install the [**runtime**](https://github.com/piku235/mobilus-gtw-runtime) by running:
 
 ```bash
-cd /tmp && wget --no-check-certificate https://raw.githubusercontent.com/piku235/mobilus-gtw-runtime/main/install.sh
-chmod a+x install.sh
-./install.sh
+wget --no-check-certificate -qO- https://raw.githubusercontent.com/piku235/mobilus-gtw-runtime/main/install.sh | sh
 ```
 
 Then, you can install the **moblink** with this simple command:
 
 ```bash
-/opt/jungi/scripts/pkg install moblink
+/opt/jungi/bin/pkg install moblink
 ```
 
 Adjust config parameters in `/opt/jungi/etc/moblink.conf` and start the service:
