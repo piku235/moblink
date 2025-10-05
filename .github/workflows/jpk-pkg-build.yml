@@ -59,7 +59,10 @@ jobs:
       - name: Build moblink
         run: cmake --build build
 
-      - name: Make package
+      - name: Strip moblink
+        run: mipsel-openwrt-linux-strip build/moblink
+
+      - name: Build package
         run: |
           mkdir -p target/.pkg
           mkdir -p target/bin
@@ -70,9 +73,7 @@ jobs:
           echo "${{ steps.strings.outputs.version }}" > target/.pkg/version
           cp -a packaging/jpk/postinst target/.pkg
           cp -a packaging/jpk/prerm target/.pkg
-
-      - name: Build package
-        run: tar --owner=0 --group=0 -czf moblink.jpk -C target .
+          tar --owner=0 --group=0 -czf moblink.jpk -C target .
 
       - name: Upload
         uses: softprops/action-gh-release@v2
