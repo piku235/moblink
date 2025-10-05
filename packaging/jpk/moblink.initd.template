@@ -3,8 +3,8 @@
 START=99 # after mobilus
 
 USE_PROCD=1
-PROG=/opt/jungi/bin/moblink
-CONF=/opt/jungi/etc/moblink.conf
+PROG=${RUNTIME_DIR}/bin/moblink
+CONF=${RUNTIME_DIR}/etc/moblink.conf
 
 start_service() {
     procd_open_instance

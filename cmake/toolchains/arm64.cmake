@@ -5,7 +5,7 @@ set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
 
 if(NOT DEFINED CMAKE_SYSROOT)
-  message(CHECK_FAIL "CMAKE_SYSROOT must be provided")
+  message(FATAL_ERROR "CMAKE_SYSROOT must be provided")
 endif()
 
 set(ENV{PKG_CONFIG_SYSROOT_DIR} ${CMAKE_SYSROOT})
