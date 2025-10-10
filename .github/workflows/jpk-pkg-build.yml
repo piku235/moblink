@@ -71,6 +71,7 @@ jobs:
           cp -a packaging/common/moblink.conf target/etc
           cp -a packaging/jpk/moblink.initd.template target/etc/init.d/moblink.template
           echo "${{ steps.strings.outputs.version }}" > target/.pkg/version
+          cp -a packaging/jpk/conffiles target/.pkg
           cp -a packaging/jpk/postinst target/.pkg
           cp -a packaging/jpk/prerm target/.pkg
           tar --owner=0 --group=0 -czf moblink.jpk -C target .
