@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(moblink VERSION 0.1.1)
+project(moblink VERSION 0.1.3)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -11,7 +11,7 @@ pkg_check_modules(MOSQUITTO REQUIRED IMPORTED_TARGET libmosquitto)
 include(FetchContent)
 FetchContent_Declare(
   mobilus_gtw_client
-  URL https://github.com/piku235/mobilus-gtw-client/archive/refs/tags/v0.4.2.zip
+  URL https://github.com/piku235/mobilus-gtw-client/archive/refs/tags/v0.5.1.zip
 )
 FetchContent_MakeAvailable(mobilus_gtw_client)
 
