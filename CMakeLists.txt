@@ -31,6 +31,10 @@ add_executable(moblink
   src/main.cpp
 )
 
+if(DEFINED MOBILUS_DSN)
+  target_compile_definitions(moblink PRIVATE DEFAULT_MOBILUS_DSN=${MOBILUS_DSN})
+endif()
+
 target_include_directories(moblink
   PRIVATE
     include

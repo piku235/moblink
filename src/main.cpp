@@ -11,6 +11,10 @@
 #include <string>
 #include <csignal>
 
+#ifndef DEFAULT_MOBILUS_DSN
+#define DEFAULT_MOBILUS_DSN "mqtts://mobilus:8883"
+#endif
+
 using namespace moblink;
 using namespace jungi::mobilus_gtw_client;
 using filesystem::TempFile;
@@ -48,7 +52,7 @@ std::optional<MqttDsn> mqttDsnFrom(const char* env)
 }
 
 const MqttDsn kDefaultMobilusDsn = []() {
-    auto dsn = MqttDsn::from("mqtts://mobilus:8883").value();
+    auto dsn = MqttDsn::from(DEFAULT_MOBILUS_DSN).value();
     applyMobilusCaCert(dsn);
 
     return dsn;
