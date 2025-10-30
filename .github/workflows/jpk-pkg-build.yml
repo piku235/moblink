@@ -55,6 +55,7 @@ jobs:
           -DCMAKE_SYSROOT=${PWD}/target-sysroot
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/toolchains/mipsel.cmake
           -DCMAKE_BUILD_TYPE=Release
+          -DMOBILUS_DSN=\"mqtts://127.0.0.1:8883?verify=false\"
 
       - name: Build moblink
         run: cmake --build build
