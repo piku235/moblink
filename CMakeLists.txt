@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.28)
 project(moblink VERSION 0.3.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -12,12 +12,14 @@ include(FetchContent)
 FetchContent_Declare(
   mobilus_gtw_client
   URL https://github.com/piku235/mobilus-gtw-client/archive/refs/tags/v0.6.0.zip
+  EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(mobilus_gtw_client)
 
 FetchContent_Declare(
   concurrentqueue
   URL https://github.com/cameron314/concurrentqueue/archive/refs/tags/v1.0.4.zip
+  EXCLUDE_FROM_ALL
 )
 FetchContent_MakeAvailable(concurrentqueue)
 
