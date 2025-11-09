@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(moblink VERSION 0.2.0)
+project(moblink VERSION 0.3.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,6 +14,12 @@ FetchContent_Declare(
   URL https://github.com/piku235/mobilus-gtw-client/archive/refs/tags/v0.6.0.zip
 )
 FetchContent_MakeAvailable(mobilus_gtw_client)
+
+FetchContent_Declare(
+  concurrentqueue
+  URL https://github.com/cameron314/concurrentqueue/archive/refs/tags/v1.0.4.zip
+)
+FetchContent_MakeAvailable(concurrentqueue)
 
 set(MOBILUS_CACERT_FILE "${mobilus_gtw_client_SOURCE_DIR}/certs/mobilelabs_mobilus_ca.crt")
 file(READ "${MOBILUS_CACERT_FILE}" MOBILUS_CACERT)
@@ -44,6 +50,7 @@ target_include_directories(moblink
 target_link_libraries(moblink
   PRIVATE
     mobilus_gtw_client
+    concurrentqueue
     OpenSSL::Crypto
     PkgConfig::MOSQUITTO
 )

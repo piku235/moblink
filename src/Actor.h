@@ -3,12 +3,11 @@
 #include <jungi/mobilus_gtw_client/io/SocketEventHandler.h>
 #include <jungi/mobilus_gtw_client/io/SocketEvents.h>
 #include <jungi/mobilus_gtw_client/io/SelectEventLoop.h>
+#include <concurrentqueue.h>
 
 #include <future>
 #include <atomic>
 #include <thread>
-#include <queue>
-#include <mutex>
 #include <functional>
 #include <unistd.h>
 
@@ -46,7 +45,6 @@ public:
             ready.set_value();
 
             run();
-
             mRunning = false;
 
             try {
@@ -98,12 +96,9 @@ public:
         uint8_t buf[64];
         ::read(mWakeFd[0], &buf, sizeof(buf));
 
-        std::lock_guard<std::mutex> lock(mMutex);
-
-        while (!mTasks.empty()) {
-            auto& task = mTasks.front();
+        Task task;
+        while (mTasks.try_dequeue(task)) {
             mTaskHandler(std::move(task));
-            mTasks.pop();
         }
     }
 
@@ -130,13 +125,10 @@ protected:
 
     void post(Task task)
     {
-        if (!isRunning()) {
-            return;
+        if (isRunning()) {
+            mTasks.enqueue(std::move(task));
+            wakeUp();
         }
-
-        std::lock_guard<std::mutex> lock(mMutex);
-        mTasks.push(std::move(task));
-        wakeUp();
     }
 
     virtual void run() = 0;
@@ -145,8 +137,7 @@ private:
     static constexpr int kInvalidFd = -1;
 
     std::thread mSelf;
-    std::mutex mMutex;
-    std::queue<Task> mTasks;
+    moodycamel::ConcurrentQueue<Task> mTasks;
     TaskHandler mTaskHandler;
     int mWakeFd[2] = { kInvalidFd, kInvalidFd };
     std::atomic<bool> mRunning = false;
