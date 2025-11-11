@@ -1,11 +1,12 @@
 #include "mobilus_cert.h"
 #include "MqttMobilusGtwActor.h"
+#include "TargetMqttClient.h"
 #include "TargetMqttActor.h"
 
+#include <jungi/mobilus_gtw_client/MqttMobilusGtwClient.h>
 #include <filesystem/TempFile.h>
 
-#include <future>
-#include <iostream>
+#include <latch>
 #include <cstdlib>
 #include <cstdio>
 #include <string>
@@ -58,15 +59,11 @@ const MqttDsn kDefaultMobilusDsn = []() {
     return dsn;
 }();
 
-std::promise<void> gStop;
+std::latch gExit(1);
 
-void handleStopSignal(int)
+void handleSignal(int signal)
 {
-    try {
-        gStop.set_value();
-    } catch (const std::future_error& err) {
-        // ignore
-    }
+    gExit.count_down();
 }
 
 int main()
@@ -79,20 +76,19 @@ int main()
 
     applyMobilusCaCert(mobilusDsn);
 
-    MqttMobilusGtwActor mobilusGtwActor(std::move(mobilusDsn), { std::move(mobilusUsername), std::move(mobilusPassword) }, gStop);
-    TargetMqttActor targetMqttActor(std::move(targetDsn), std::move(rootTopic), gStop);
+    MqttMobilusGtwActor mobilusGtwActor(MqttMobilusGtwClient::builder().dsn(mobilusDsn).login({ mobilusUsername, mobilusPassword }));
+    TargetMqttActor targetMqttActor(std::move(targetDsn), std::move(rootTopic));
+    
+    mobilusGtwActor.latch(&gExit);
+    targetMqttActor.latch(&gExit);
 
     mobilusGtwActor.pushEventsTo(&targetMqttActor);
     targetMqttActor.pushCommandsTo(&mobilusGtwActor);
 
-    signal(SIGINT, handleStopSignal);
-    signal(SIGTERM, handleStopSignal);
+    signal(SIGINT, handleSignal);
+    signal(SIGTERM, handleSignal);
 
-    mobilusGtwActor.start();
-    targetMqttActor.start();
-
-    auto stopFut = gStop.get_future();
-    stopFut.wait();
+    gExit.wait();
 
     return 0;
 }

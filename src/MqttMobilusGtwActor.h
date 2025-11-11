@@ -1,38 +1,38 @@
 #pragma once
 
 #include "Actor.h"
+#include "Messages.h"
 
-#include <jungi/mobilus_gtw_client/MqttDsn.h>
-#include <jungi/mobilus_gtw_client/MobilusCredentials.h>
 #include <jungi/mobilus_gtw_client/MqttMobilusGtwClient.h>
-#include <jungi/mobilus_gtw_client/proto/CallEvents.pb.h>
 
-#include <string>
 #include <memory>
-#include <future>
 
 namespace moblink {
 
+namespace mobgtw = jungi::mobilus_gtw_client;
+
 class TargetMqttActor;
 
-class MqttMobilusGtwActor final : public Actor<jungi::mobilus_gtw_client::MqttMobilusGtwClient> {
+class MqttMobilusGtwActor final : public Actor<MqttMobilusGtwActor, MobilusGtwCommandVariant> {
 public:
-    using BaseActor = Actor<jungi::mobilus_gtw_client::MqttMobilusGtwClient>;
+    using Command = MobilusGtwCommandVariant;
+    using Actor<MqttMobilusGtwActor, Command>::handle;
 
-    MqttMobilusGtwActor(jungi::mobilus_gtw_client::MqttDsn dsn, jungi::mobilus_gtw_client::MobilusCredentials mobilusCreds, std::promise<void>& onFinished = BaseActor::defaultFinishedPromise);
+    MqttMobilusGtwActor(mobgtw::MqttMobilusGtwClient::Builder& builder);
+    ~MqttMobilusGtwActor();
 
-    void pushEventsTo(TargetMqttActor* targetMqttActor);
+    void pushEventsTo(TargetMqttActor* actor);
     void sendCommandToDevice(long deviceId, std::string command);
+
+    void handle(const PushEventsToActorCommand& cmd);
+    void handle(const SendCommandToDeviceCommand& cmd);
 
 protected:
     void run() override;
 
 private:
-    jungi::mobilus_gtw_client::MqttDsn mDsn;
-    jungi::mobilus_gtw_client::MobilusCredentials mMobilusCreds;
-    TargetMqttActor* mTargetMqttActor = nullptr;
+    std::unique_ptr<mobgtw::MqttMobilusGtwClient> mClient;
 
-    void push(const jungi::mobilus_gtw_client::proto::CallEvents& callEvents);
 };
 
 }

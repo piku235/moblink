@@ -1,14 +1,14 @@
 #pragma once
 
-#include <jungi/mobilus_gtw_client/io/SocketEventHandler.h>
-#include <jungi/mobilus_gtw_client/io/SocketEvents.h>
-#include <jungi/mobilus_gtw_client/io/SelectEventLoop.h>
-#include <concurrentqueue.h>
+#include "Messages.h"
 
-#include <future>
-#include <atomic>
+#include <concurrentqueue.h>
+#include <jungi/mobilus_gtw_client/io/SocketEventHandler.h>
+#include <jungi/mobilus_gtw_client/io/SelectEventLoop.h>
+
 #include <thread>
-#include <functional>
+#include <variant>
+#include <latch>
 #include <unistd.h>
 
 namespace moblink {
@@ -16,66 +16,20 @@ namespace moblink {
 namespace mobgtw = jungi::mobilus_gtw_client;
 
 template <typename T>
+concept Variant = requires {
+    typename std::variant_size<T>::type;
+};
+
+template <typename Derived, Variant Message>
 class Actor : public mobgtw::io::SocketEventHandler {
 public:
     virtual ~Actor()
     {
-        stop();
-    }
-
-    explicit Actor(std::promise<void>& onFinished = defaultFinishedPromise)
-        : mFinishedPromise(onFinished)
-    {
-    }
-
-    void start()
-    {
-        if (isRunning()) {
-            return;
-        }
-        if (pipe(mWakeFd) != 0) {
-            return;
-        }
-
-        std::promise<void> ready;
-        auto readyFut = ready.get_future();
-
-        mSelf = std::thread([this, ready = std::move(ready)]() mutable {
-            mRunning = true;
-            ready.set_value();
-
-            run();
-            mRunning = false;
-
-            try {
-                mFinishedPromise.set_value();
-            } catch (const std::future_error&) {
-                // ignore
-            }
-        });
-
-        readyFut.wait();
-    }
-
-    void stop()
-    {
-        post([](mobgtw::io::SelectEventLoop& loop, T&) { loop.stop(); });
-        join();
-
         if (kInvalidFd != mWakeFd[0]) {
-            close(mWakeFd[0]);
-            mWakeFd[0] = kInvalidFd;
+            (void)::close(mWakeFd[0]);
         }
         if (kInvalidFd != mWakeFd[1]) {
-            close(mWakeFd[1]);
-            mWakeFd[1] = kInvalidFd;
-        }
-    }
-
-    void join()
-    {
-        if (mSelf.joinable()) {
-            mSelf.join();
+            (void)::close(mWakeFd[1]);
         }
     }
 
@@ -94,40 +48,68 @@ public:
         }
 
         uint8_t buf[64];
-        ::read(mWakeFd[0], &buf, sizeof(buf));
+        (void)::read(mWakeFd[0], &buf, sizeof(buf));
 
-        Task task;
-        while (mTasks.try_dequeue(task)) {
-            mTaskHandler(std::move(task));
+        Message message;
+        while (mMailbox.try_dequeue(message)) {
+            std::visit([self = static_cast<Derived*>(this)](auto&& msg) { self->handle(std::forward<decltype(msg)>(msg)); }, message);
         }
     }
 
-    bool isRunning() const
+    void stop()
     {
-        return mRunning.load();
+        enqueue(StopActorCommand {});
+    }
+
+    void handle(const StopActorCommand& cmd)
+    {
+        mLoop.stop();
+    }
+
+    void latch(std::latch* latch)
+    {
+        mLatch = latch;
     }
 
 protected:
-    using Task = std::function<void(mobgtw::io::SelectEventLoop&, T&)>;
-    using TaskHandler = std::function<void(Task)>;
-    
-    static std::promise<void> defaultFinishedPromise;
+    mobgtw::io::SelectEventLoop mLoop;
 
-    void runLoop(mobgtw::io::SelectEventLoop& loop, T& dependency)
+    Actor()
     {
-        mTaskHandler = [&](Task task) { task(loop, dependency); };
-
-        loop.watchSocket(mWakeFd[0], this);
-        loop.run();
-
-        mTaskHandler = [](Task) {};
+        pipe(mWakeFd);
     }
 
-    void post(Task task)
+    void start()
     {
-        if (isRunning()) {
-            mTasks.enqueue(std::move(task));
-            wakeUp();
+        mSelf = std::thread([this] {
+            run();
+            if (nullptr != mLatch) {
+                mLatch->count_down();
+            }
+        });
+    }
+
+    void enqueue(Message message)
+    {
+        uint8_t byte = 1;
+
+        mMailbox.enqueue(std::move(message));
+        (void)::write(mWakeFd[1], &byte, 1);
+    }
+
+    void loop()
+    {
+        mLoop.watchSocket(mWakeFd[0], this);
+        mLoop.run();
+        mLoop.unwatchSocket(mWakeFd[0]);
+    }
+
+    void shutdown()
+    {
+        stop();
+
+        if (mSelf.joinable()) {
+            mSelf.join();
         }
     }
 
@@ -137,17 +119,9 @@ private:
     static constexpr int kInvalidFd = -1;
 
     std::thread mSelf;
-    moodycamel::ConcurrentQueue<Task> mTasks;
-    TaskHandler mTaskHandler;
+    moodycamel::ConcurrentQueue<Message> mMailbox;
+    std::latch* mLatch = nullptr;
     int mWakeFd[2] = { kInvalidFd, kInvalidFd };
-    std::atomic<bool> mRunning = false;
-    std::promise<void>& mFinishedPromise;
-    
-    void wakeUp()
-    {
-        uint8_t byte = 1;
-        ::write(mWakeFd[1], &byte, 1);
-    }
 };
 
 }

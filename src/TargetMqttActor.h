@@ -1,41 +1,42 @@
 #pragma once
 
 #include "Actor.h"
+#include "Messages.h"
 #include "TargetMqttClient.h"
 
 #include <jungi/mobilus_gtw_client/MqttDsn.h>
 
 #include <string>
-#include <thread>
-#include <queue>
-#include <mutex>
-#include <memory>
 #include <optional>
 
 namespace moblink {
 
 class MqttMobilusGtwActor;
 
-class TargetMqttActor final : public Actor<TargetMqttClient> {
+class TargetMqttActor final : public Actor<TargetMqttActor, TargetMqttCommandVariant> {
 public:
-    using BaseActor = Actor<TargetMqttClient>;
-    
-    TargetMqttActor(jungi::mobilus_gtw_client::MqttDsn dsn, std::optional<std::string> rootTopic = std::nullopt, std::promise<void>& onFinished = BaseActor::defaultFinishedPromise);
+    using Command = TargetMqttCommandVariant;
+    using Actor<TargetMqttActor, Command>::handle;
 
-    void pushCommandsTo(MqttMobilusGtwActor* mobGtwMqttActor);
+    TargetMqttActor(mobgtw::MqttDsn dsn, std::optional<std::string> rootTopic = std::nullopt);
+    ~TargetMqttActor();
+
+    void pushCommandsTo(MqttMobilusGtwActor* actor);
     void publishDeviceState(long deviceId, std::string state);
     void publishDeviceError(long deviceId, std::string error);
     void publishDevicePendingCommand(long deviceId, std::string command);
+
+    void handle(const PushCommandsToActorCommand& cmd);
+    void handle(const PublishDeviceStateCommand& cmd);
+    void handle(const PublishDeviceErrorCommand& cmd);
+    void handle(const PublishDevicePendingCommand& cmd);
 
 protected:
     void run() override;
 
 private:
-    jungi::mobilus_gtw_client::MqttDsn mDsn;
-    std::optional<std::string> mRootTopic;
-    MqttMobilusGtwActor* mMobGtwMqttActor = nullptr;
+    TargetMqttClient mClient;
 
-    void push(long deviceId, std::string command);
 };
 
 }

@@ -1,4 +1,5 @@
 #include "TargetMqttActor.h"
+#include "TargetMqttClient.h"
 #include "MqttMobilusGtwActor.h"
 
 #include <jungi/mobilus_gtw_client/io/SelectEventLoop.h>
@@ -9,68 +10,75 @@ using namespace jungi::mobilus_gtw_client;
 
 namespace moblink {
 
-TargetMqttActor::TargetMqttActor(MqttDsn dsn, std::optional<std::string> rootTopic, std::promise<void>& onFinished)
-    : BaseActor(onFinished)
-    , mDsn(std::move(dsn))
-    , mRootTopic(std::move(rootTopic))
+TargetMqttActor::TargetMqttActor(MqttDsn dsn, std::optional<std::string> rootTopic)
+    : mClient(std::move(dsn), mLoop)
 {
+    if (rootTopic) {
+        mClient.setRootTopic(std::move(*rootTopic));
+    }
+
+    start();
 }
 
-void TargetMqttActor::pushCommandsTo(MqttMobilusGtwActor* mobGtwMqttActor)
+TargetMqttActor::~TargetMqttActor()
 {
-    mMobGtwMqttActor = mobGtwMqttActor;
-}
-
-void TargetMqttActor::publishDeviceState(long deviceId, std::string state)
-{
-    post([deviceId, state = std::move(state)](io::EventLoop&, TargetMqttClient& client) {
-        client.publishDeviceState(deviceId, state);
-        std::cout << "Published state: " << state << " for device id: " << deviceId << std::endl;
-    });
-}
-
-void TargetMqttActor::publishDeviceError(long deviceId, std::string error)
-{
-    post([deviceId, error = std::move(error)](io::EventLoop&, TargetMqttClient& client) {
-        client.publishDeviceError(deviceId, error);
-        std::cout << "Published error: " << error << " for device id: " << deviceId << std::endl;
-    });
-}
-
-void TargetMqttActor::publishDevicePendingCommand(long deviceId, std::string command)
-{
-    post([deviceId, command = std::move(command)](io::EventLoop&, TargetMqttClient& client) {
-        client.publishDevicePendingCommand(deviceId, command);
-        std::cout << "Published pending command: " << command << " for device id: " << deviceId << std::endl;
-    });
+    shutdown();
 }
 
 void TargetMqttActor::run()
 {
-    io::SelectEventLoop loop;
-    TargetMqttClient client(std::move(mDsn), loop);
-
-    if (mRootTopic) {
-        client.setRootTopic(std::move(*mRootTopic));
-    }
-
-    client.subscribeDeviceCommands([this](long deviceId, std::string command) { push(deviceId, std::move(command)); });
-
-    if (!client.connect()) {
-        std::cerr << "Unable to connect to target MQTT broker" << std::endl;
+    if (!mClient.connect()) {
+        std::cout << "Unable to connect to target MQTT broker" << std::endl;
         return;
     }
 
     std::cout << "Connected to target MQTT broker" << std::endl;
-    runLoop(loop, client);
+    loop();
 }
 
-void TargetMqttActor::push(long deviceId, std::string command)
+void TargetMqttActor::pushCommandsTo(MqttMobilusGtwActor* actor)
 {
-    if (nullptr != mMobGtwMqttActor) {
-        mMobGtwMqttActor->sendCommandToDevice(deviceId, command);
-        std::cout << "Sent command: " << command << " to device id: " << deviceId << std::endl;
-    }
+    enqueue(PushCommandsToActorCommand { actor });
+}
+
+void TargetMqttActor::publishDeviceState(long deviceId, std::string state)
+{
+    enqueue(PublishDeviceStateCommand { deviceId, std::move(state) });
+}
+
+void TargetMqttActor::publishDeviceError(long deviceId, std::string error)
+{
+    enqueue(PublishDeviceErrorCommand { deviceId, std::move(error) });
+}
+
+void TargetMqttActor::publishDevicePendingCommand(long deviceId, std::string command)
+{
+    enqueue(PublishDevicePendingCommand { deviceId, std::move(command) });
+}
+
+void TargetMqttActor::handle(const PushCommandsToActorCommand& cmd)
+{
+    mClient.subscribeDeviceCommands([actor = cmd.actor](long deviceId, std::string command) {
+        actor->sendCommandToDevice(deviceId, command);
+    });
+}
+
+void TargetMqttActor::handle(const PublishDeviceStateCommand& cmd)
+{
+    mClient.publishDeviceState(cmd.deviceId, cmd.state);
+    std::cout << "Published state: " << cmd.state << " for device id: " << cmd.deviceId << std::endl;
+}
+
+void TargetMqttActor::handle(const PublishDeviceErrorCommand& cmd)
+{
+    mClient.publishDeviceError(cmd.deviceId, cmd.error);
+    std::cout << "Published error: " << cmd.error << " for device id: " << cmd.deviceId << std::endl;
+}
+
+void TargetMqttActor::handle(const PublishDevicePendingCommand& cmd)
+{
+    mClient.publishDevicePendingCommand(cmd.deviceId, cmd.command);
+    std::cout << "Published pending command: " << cmd.command << " for device id: " << cmd.deviceId << std::endl;
 }
 
 }
