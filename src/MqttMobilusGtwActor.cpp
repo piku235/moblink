@@ -7,6 +7,7 @@
 #include <jungi/mobilus_gtw_client/proto/CallEvents.pb.h>
 
 #include <iostream>
+#include <format>
 
 using namespace jungi::mobilus_gtw_client;
 using std::chrono::steady_clock;
@@ -27,11 +28,11 @@ MqttMobilusGtwActor::~MqttMobilusGtwActor()
 void MqttMobilusGtwActor::run()
 {
     if (auto r = mClient->connect(); !r) {
-        std::cerr << "Connection failed: " << r.error().message() << std::endl;
+        std::cerr << std::format("Connection failed: {}\n",  r.error().message());
         return;
     }
 
-    std::cout << "Connected to mobilus" << std::endl;
+    std::cout << "Connected to mobilus\n";
     loop();
 }
 
@@ -79,7 +80,7 @@ void MqttMobilusGtwActor::handle(const SendCommandToDeviceCommand& cmd)
     event->set_platform(Platform::Web);
 
     (void)mClient->send(callEvents);
-    std::cout << "Sent command: " << cmd.command << " for device id: " << cmd.deviceId << std::endl;
+    std::cout << std::format("Sent command: {} for device id: {}\n", cmd.command, cmd.deviceId);
 }
 
 }

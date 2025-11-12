@@ -5,6 +5,7 @@
 #include <jungi/mobilus_gtw_client/io/SelectEventLoop.h>
 
 #include <iostream>
+#include <format>
 
 using namespace jungi::mobilus_gtw_client;
 
@@ -28,11 +29,11 @@ TargetMqttActor::~TargetMqttActor()
 void TargetMqttActor::run()
 {
     if (!mClient.connect()) {
-        std::cout << "Unable to connect to target MQTT broker" << std::endl;
+        std::cout << "Unable to connect to target MQTT broker\n";
         return;
     }
 
-    std::cout << "Connected to target MQTT broker" << std::endl;
+    std::cout << "Connected to target MQTT broker\n";
     loop();
 }
 
@@ -66,19 +67,19 @@ void TargetMqttActor::handle(const PushCommandsToActorCommand& cmd)
 void TargetMqttActor::handle(const PublishDeviceStateCommand& cmd)
 {
     mClient.publishDeviceState(cmd.deviceId, cmd.state);
-    std::cout << "Published state: " << cmd.state << " for device id: " << cmd.deviceId << std::endl;
+    std::cout << std::format("Published state: {} for device id: {}\n", cmd.state, cmd.deviceId);
 }
 
 void TargetMqttActor::handle(const PublishDeviceErrorCommand& cmd)
 {
     mClient.publishDeviceError(cmd.deviceId, cmd.error);
-    std::cout << "Published error: " << cmd.error << " for device id: " << cmd.deviceId << std::endl;
+    std::cout << std::format("Published error: {} for device id: {}\n", cmd.error, cmd.deviceId);
 }
 
 void TargetMqttActor::handle(const PublishDevicePendingCommand& cmd)
 {
     mClient.publishDevicePendingCommand(cmd.deviceId, cmd.command);
-    std::cout << "Published pending command: " << cmd.command << " for device id: " << cmd.deviceId << std::endl;
+    std::cout << std::format("Published pending command: {} for device id: {}\n", cmd.command, cmd.deviceId);
 }
 
 }
