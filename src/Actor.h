@@ -74,13 +74,12 @@ public:
 protected:
     mobgtw::io::SelectEventLoop mLoop;
 
-    Actor()
-    {
-        pipe(mWakeFd);
-    }
-
     void start()
     {
+        if (-1 == pipe(mWakeFd)) {
+            return;
+        }
+
         mSelf = std::thread([this] {
             run();
             if (nullptr != mLatch) {
