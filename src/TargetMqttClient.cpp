@@ -196,6 +196,7 @@ void TargetMqttClient::handleMisc()
         return;
     }
 
+    mLoop.stopTimer(mMiscTimerId);
     mMiscTimerId = mLoop.startTimer(kDelay, miscTimerCallback, this);
 }
 
