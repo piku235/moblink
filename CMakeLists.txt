@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(moblink VERSION 0.3.1)
+project(moblink VERSION 0.4.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,10 +9,10 @@ find_package(OpenSSL REQUIRED)
 pkg_check_modules(MOSQUITTO REQUIRED IMPORTED_TARGET libmosquitto)
 
 include(cmake/CPM.cmake)
-CPMAddPackage("gh:piku235/mobilus-gtw-client@0.8.0")
+CPMAddPackage("gh:piku235/mobgtw#main")
 CPMAddPackage("gh:cameron314/concurrentqueue@1.0.4")
 
-set(MOBILUS_CACERT_FILE "${mobilus_gtw_client_SOURCE_DIR}/certs/mobilelabs_mobilus_ca.crt")
+set(MOBILUS_CACERT_FILE "${mobgtw_SOURCE_DIR}/certs/mobilelabs_mobilus_ca.crt")
 file(READ "${MOBILUS_CACERT_FILE}" MOBILUS_CACERT)
 
 configure_file(
@@ -40,7 +40,7 @@ target_include_directories(moblink
 
 target_link_libraries(moblink
   PRIVATE
-    mobilus_gtw_client
+    mobgtw
     concurrentqueue
     OpenSSL::Crypto
     PkgConfig::MOSQUITTO

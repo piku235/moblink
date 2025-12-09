@@ -1,20 +1,19 @@
 #include "MqttMobilusGtwActor.h"
 #include "TargetMqttActor.h"
 
-#include <jungi/mobilus_gtw_client/Platform.h>
-#include <jungi/mobilus_gtw_client/EventNumber.h>
-#include <jungi/mobilus_gtw_client/MessageType.h>
-#include <jungi/mobilus_gtw_client/proto/CallEvents.pb.h>
+#include <jungi/mobgtw/Platform.h>
+#include <jungi/mobgtw/EventNumber.h>
+#include <jungi/mobgtw/proto/CallEvents.pb.h>
 
 #include <iostream>
 #include <format>
 
-using namespace jungi::mobilus_gtw_client;
+using namespace jungi::mobgtw;
 using std::chrono::steady_clock;
 
 namespace moblink {
 
-MqttMobilusGtwActor::MqttMobilusGtwActor(mobgtw::MqttMobilusGtwClient::Builder& builder)
+MqttMobilusGtwActor::MqttMobilusGtwActor(MqttMobilusGtwClient::Builder& builder)
     : mClient(builder.attachTo(&mLoop).build())
 {
     start();
@@ -48,7 +47,7 @@ void MqttMobilusGtwActor::sendCommandToDevice(long deviceId, std::string command
 
 void MqttMobilusGtwActor::handle(const PushEventsToActorCommand& cmd)
 {
-    mClient->messageBus().subscribe<proto::CallEvents>(MessageType::CallEvents, [actor = cmd.actor](const auto& callEvents) {
+    mClient->messageBus().subscribe<proto::CallEvents>([actor = cmd.actor](const auto& callEvents) {
         if (callEvents.events_size() < 1) {
             return;
         }

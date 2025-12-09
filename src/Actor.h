@@ -3,8 +3,8 @@
 #include "Messages.h"
 
 #include <concurrentqueue.h>
-#include <jungi/mobilus_gtw_client/io/SocketEventHandler.h>
-#include <jungi/mobilus_gtw_client/io/SelectEventLoop.h>
+#include <jungi/mobgtw/io/SocketEventHandler.h>
+#include <jungi/mobgtw/io/SelectEventLoop.h>
 
 #include <thread>
 #include <variant>
@@ -13,15 +13,13 @@
 
 namespace moblink {
 
-namespace mobgtw = jungi::mobilus_gtw_client;
-
 template <typename T>
 concept Variant = requires {
     typename std::variant_size<T>::type;
 };
 
 template <typename Derived, Variant Message>
-class Actor : public mobgtw::io::SocketEventHandler {
+class Actor : public jungi::mobgtw::io::SocketEventHandler {
 public:
     virtual ~Actor()
     {
@@ -33,17 +31,17 @@ public:
         }
     }
 
-    mobgtw::io::SocketEvents socketEvents() override
+    jungi::mobgtw::io::SocketEvents socketEvents() override
     {
-        mobgtw::io::SocketEvents events;
-        events.set(mobgtw::io::SocketEvents::Read);
+        jungi::mobgtw::io::SocketEvents events;
+        events.set(jungi::mobgtw::io::SocketEvents::Read);
 
         return events;
     }
 
-    void handleSocketEvents(mobgtw::io::SocketEvents revents) override
+    void handleSocketEvents(jungi::mobgtw::io::SocketEvents revents) override
     {
-        if (!revents.has(mobgtw::io::SocketEvents::Read)) {
+        if (!revents.has(jungi::mobgtw::io::SocketEvents::Read)) {
             return;
         }
 
@@ -72,7 +70,7 @@ public:
     }
 
 protected:
-    mobgtw::io::SelectEventLoop mLoop;
+    jungi::mobgtw::io::SelectEventLoop mLoop;
 
     void start()
     {

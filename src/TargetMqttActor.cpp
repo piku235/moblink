@@ -2,12 +2,12 @@
 #include "TargetMqttClient.h"
 #include "MqttMobilusGtwActor.h"
 
-#include <jungi/mobilus_gtw_client/io/SelectEventLoop.h>
+#include <jungi/mobgtw/io/SelectEventLoop.h>
 
 #include <iostream>
 #include <format>
 
-using namespace jungi::mobilus_gtw_client;
+using namespace jungi::mobgtw;
 
 namespace moblink {
 

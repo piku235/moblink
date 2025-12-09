@@ -4,7 +4,7 @@
 #include "Messages.h"
 #include "TargetMqttClient.h"
 
-#include <jungi/mobilus_gtw_client/MqttDsn.h>
+#include <jungi/mobgtw/MqttDsn.h>
 
 #include <string>
 #include <optional>
@@ -18,7 +18,7 @@ public:
     using Command = TargetMqttCommandVariant;
     using Actor<TargetMqttActor, Command>::handle;
 
-    TargetMqttActor(mobgtw::MqttDsn dsn, std::optional<std::string> rootTopic = std::nullopt);
+    TargetMqttActor(jungi::mobgtw::MqttDsn dsn, std::optional<std::string> rootTopic = std::nullopt);
     ~TargetMqttActor();
 
     void pushCommandsTo(MqttMobilusGtwActor* actor);

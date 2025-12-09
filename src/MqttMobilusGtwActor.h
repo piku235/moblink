@@ -3,13 +3,11 @@
 #include "Actor.h"
 #include "Messages.h"
 
-#include <jungi/mobilus_gtw_client/MqttMobilusGtwClient.h>
+#include <jungi/mobgtw/MqttMobilusGtwClient.h>
 
 #include <memory>
 
 namespace moblink {
-
-namespace mobgtw = jungi::mobilus_gtw_client;
 
 class TargetMqttActor;
 
@@ -18,7 +16,7 @@ public:
     using Command = MobilusGtwCommandVariant;
     using Actor<MqttMobilusGtwActor, Command>::handle;
 
-    MqttMobilusGtwActor(mobgtw::MqttMobilusGtwClient::Builder& builder);
+    MqttMobilusGtwActor(jungi::mobgtw::MqttMobilusGtwClient::Builder& builder);
     ~MqttMobilusGtwActor();
 
     void pushEventsTo(TargetMqttActor* actor);
@@ -31,7 +29,7 @@ protected:
     void run() override;
 
 private:
-    std::unique_ptr<mobgtw::MqttMobilusGtwClient> mClient;
+    std::unique_ptr<jungi::mobgtw::MqttMobilusGtwClient> mClient;
 
 };
 

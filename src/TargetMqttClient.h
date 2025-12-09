@@ -1,9 +1,9 @@
 #pragma once
 
-#include <jungi/mobilus_gtw_client/MqttDsn.h>
-#include <jungi/mobilus_gtw_client/io/SocketEvents.h>
-#include <jungi/mobilus_gtw_client/io/SocketEventHandler.h>
-#include <jungi/mobilus_gtw_client/io/EventLoop.h>
+#include <jungi/mobgtw/MqttDsn.h>
+#include <jungi/mobgtw/io/SocketEvents.h>
+#include <jungi/mobgtw/io/SocketEventHandler.h>
+#include <jungi/mobgtw/io/EventLoop.h>
 
 #include <mosquitto.h>
 
@@ -12,13 +12,11 @@
 
 namespace moblink {
 
-namespace mobgtw = jungi::mobilus_gtw_client;
-
-class TargetMqttClient final : public mobgtw::io::SocketEventHandler {
+class TargetMqttClient final : public jungi::mobgtw::io::SocketEventHandler {
 public:
     using DeviceCommandSubscriber = std::function<void(long, const std::string&)>;
 
-    TargetMqttClient(mobgtw::MqttDsn dsn, mobgtw::io::EventLoop& loop);
+    TargetMqttClient(jungi::mobgtw::MqttDsn dsn, jungi::mobgtw::io::EventLoop& loop);
     ~TargetMqttClient();
 
     TargetMqttClient(const TargetMqttClient& other) = delete;
@@ -32,15 +30,15 @@ public:
     void publishDevicePendingCommand(long deviceId, const std::string& command);
     void subscribeDeviceCommands(DeviceCommandSubscriber subscriber);
 
-    mobgtw::io::SocketEvents socketEvents() override;
-    void handleSocketEvents(mobgtw::io::SocketEvents revents) override;
+    jungi::mobgtw::io::SocketEvents socketEvents() override;
+    void handleSocketEvents(jungi::mobgtw::io::SocketEvents revents) override;
 
 private:
     mosquitto* mMosq = nullptr;
     bool mConnected = false;
-    mobgtw::MqttDsn mDsn;
-    mobgtw::io::EventLoop& mLoop;
-    mobgtw::io::EventLoop::TimerId mMiscTimerId = mobgtw::io::EventLoop::kInvalidTimerId;
+    jungi::mobgtw::MqttDsn mDsn;
+    jungi::mobgtw::io::EventLoop& mLoop;
+    jungi::mobgtw::io::EventLoop::TimerId mMiscTimerId = jungi::mobgtw::io::EventLoop::kInvalidTimerId;
     std::string mRootTopic = "mobilus";
     DeviceCommandSubscriber mDeviceCommandSubscriber = [](long, const std::string&) {};
 

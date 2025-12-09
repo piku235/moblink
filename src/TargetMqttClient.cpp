@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstdarg>
 
-using namespace jungi::mobilus_gtw_client;
+using namespace jungi::mobgtw;
 
 static constexpr char kDeviceStateTopic[] = "devices/%ld/state";
 static constexpr char kDeviceErrorTopic[] = "devices/%ld/error";
@@ -15,7 +15,7 @@ static constexpr std::chrono::seconds kDelay(1);
 
 namespace moblink {
 
-TargetMqttClient::TargetMqttClient(mobgtw::MqttDsn dsn, mobgtw::io::EventLoop& loop)
+TargetMqttClient::TargetMqttClient(MqttDsn dsn, io::EventLoop& loop)
     : mDsn(std::move(dsn))
     , mLoop(loop)
 {
@@ -144,7 +144,7 @@ void TargetMqttClient::subscribeDeviceCommands(DeviceCommandSubscriber subscribe
     mDeviceCommandSubscriber = std::move(subscriber);
 }
 
-mobgtw::io::SocketEvents TargetMqttClient::socketEvents()
+io::SocketEvents TargetMqttClient::socketEvents()
 {
     if (!mConnected) {
         return {};
@@ -160,7 +160,7 @@ mobgtw::io::SocketEvents TargetMqttClient::socketEvents()
     return socketEvents;
 }
 
-void TargetMqttClient::handleSocketEvents(mobgtw::io::SocketEvents revents)
+void TargetMqttClient::handleSocketEvents(io::SocketEvents revents)
 {
     if (!mConnected) {
         return;

@@ -3,7 +3,7 @@
 #include "TargetMqttClient.h"
 #include "TargetMqttActor.h"
 
-#include <jungi/mobilus_gtw_client/MqttMobilusGtwClient.h>
+#include <jungi/mobgtw/MqttMobilusGtwClient.h>
 #include <filesystem/TempFile.h>
 
 #include <latch>
@@ -17,7 +17,7 @@
 #endif
 
 using namespace moblink;
-using namespace jungi::mobilus_gtw_client;
+using namespace jungi::mobgtw;
 using filesystem::TempFile;
 
 TempFile loadMobilusCaCert()
