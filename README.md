@@ -81,10 +81,10 @@ sudo systemctl status moblink
 
 Installation is performed on the Cosmo GTW via SSH. How to enable SSH access, you'll find [here](https://forum.arturhome.pl/t/aktywacja-ssh-dla-mobilus-cosmo-gtw/15325).
 
-Once you login via SSH, you need to download and install the [**runtime**](https://github.com/piku235/mobilus-gtw-runtime) by running:
+Once you login via SSH, you need to download and install the [**runtime**](https://github.com/piku235/mobgtw-runtime) by running:
 
 ```bash
-wget --no-check-certificate -qO- https://raw.githubusercontent.com/piku235/mobilus-gtw-runtime/main/install.sh | sh
+wget --no-check-certificate -qO- https://raw.githubusercontent.com/piku235/mobgtw-runtime/main/install.sh | sh
 ```
 
 Then, you can install the **moblink** with this simple command:
