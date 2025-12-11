@@ -9,7 +9,7 @@ find_package(OpenSSL REQUIRED)
 pkg_check_modules(MOSQUITTO REQUIRED IMPORTED_TARGET libmosquitto)
 
 include(cmake/CPM.cmake)
-CPMAddPackage("gh:piku235/mobgtw#main")
+CPMAddPackage("gh:piku235/mobgtw@0.9.0")
 CPMAddPackage("gh:cameron314/concurrentqueue@1.0.4")
 
 set(MOBILUS_CACERT_FILE "${mobgtw_SOURCE_DIR}/certs/mobilelabs_mobilus_ca.crt")
