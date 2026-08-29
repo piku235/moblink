@@ -48,7 +48,7 @@ bool TargetMqttClient::connect()
             return false;
         }
 
-        mosquitto_tls_insecure_set(mMosq, mDsn.verify.value_or(true) ? false : true);
+        mosquitto_tls_insecure_set(mMosq, !mDsn.verify.value_or(true));
     }
 
     if (MOSQ_ERR_SUCCESS != mosquitto_username_pw_set(mMosq, mDsn.username ? (*mDsn.username).c_str() : nullptr, mDsn.password ? (*mDsn.password).c_str() : nullptr)) {
@@ -60,7 +60,7 @@ bool TargetMqttClient::connect()
 
     mosquitto_message_callback_set(mMosq, onMessageCallback);
     mosquitto_connect_callback_set(mMosq, [](mosquitto*, void* obj, int rc) {
-        auto connectRc = reinterpret_cast<int*>(obj);
+        auto connectRc = static_cast<int*>(obj);
         *connectRc = rc;
     });
 
@@ -205,7 +205,7 @@ void TargetMqttClient::onMessage(const mosquitto_message* message)
     long deviceId;
 
     if (sscanf(message->topic, buildTopic(kDeviceCommandTopic).c_str(), &deviceId) > 0) {
-        mDeviceCommandSubscriber(deviceId, std::string(reinterpret_cast<const char*>(message->payload), message->payloadlen));
+        mDeviceCommandSubscriber(deviceId, std::string(static_cast<const char*>(message->payload), message->payloadlen));
     }
 }
 

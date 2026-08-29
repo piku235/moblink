@@ -60,7 +60,7 @@ void TargetMqttActor::publishDevicePendingCommand(long deviceId, std::string com
 void TargetMqttActor::handle(const PushCommandsToActorCommand& cmd)
 {
     mClient.subscribeDeviceCommands([actor = cmd.actor](long deviceId, std::string command) {
-        actor->sendCommandToDevice(deviceId, command);
+        actor->sendCommandToDevice(deviceId, std::move(command));
     });
 }
 

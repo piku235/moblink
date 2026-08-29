@@ -17,12 +17,12 @@ public:
     using DeviceCommandSubscriber = std::function<void(long, const std::string&)>;
 
     TargetMqttClient(jungi::mobgtw::MqttDsn dsn, jungi::mobgtw::io::EventLoop& loop);
-    ~TargetMqttClient();
+    ~TargetMqttClient() override;
 
     TargetMqttClient(const TargetMqttClient& other) = delete;
     TargetMqttClient& operator=(const TargetMqttClient& other) = delete;
 
-    bool connect();
+    [[nodiscard]] bool connect();
     void disconnect();
     void setRootTopic(std::string rootTopic);
     void publishDeviceState(long deviceId, const std::string& state);
@@ -47,8 +47,8 @@ private:
 
     void onMessage(const mosquitto_message* message);
     void handleMisc();
-    std::string buildTopic(const char* topic);
-    std::string formatTopic(const char* format, ...);
+    [[nodiscard]] std::string buildTopic(const char* topic);
+    [[nodiscard]] std::string formatTopic(const char* format, ...);
 };
 
 }

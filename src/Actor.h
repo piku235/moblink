@@ -21,7 +21,7 @@ concept Variant = requires {
 template <typename Derived, Variant Message>
 class Actor : public jungi::mobgtw::io::SocketEventHandler {
 public:
-    virtual ~Actor()
+    ~Actor() override
     {
         if (kInvalidFd != mWakeFd[0]) {
             (void)::close(mWakeFd[0]);

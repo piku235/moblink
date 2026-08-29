@@ -28,14 +28,12 @@ TempFile loadMobilusCaCert()
     return tempFile;
 }
 
-auto applyMobilusCaCert(MqttDsn& dsn)
+void applyMobilusCaCert(MqttDsn& dsn)
 {
     if (dsn.secure && !dsn.cacert) {
         static auto cacert = loadMobilusCaCert();
         dsn.cacert = cacert.path();
     }
-
-    return dsn;
 }
 
 std::optional<std::string> envFrom(const char* env)
@@ -61,7 +59,7 @@ const MqttDsn kDefaultMobilusDsn = []() {
 
 std::latch gExit(1);
 
-void handleSignal(int signal)
+void handleSignal(int)
 {
     gExit.count_down();
 }

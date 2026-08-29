@@ -16,10 +16,10 @@ class MqttMobilusGtwActor;
 class TargetMqttActor final : public Actor<TargetMqttActor, TargetMqttCommandVariant> {
 public:
     using Command = TargetMqttCommandVariant;
-    using Actor<TargetMqttActor, Command>::handle;
+    using Actor::handle;
 
     TargetMqttActor(jungi::mobgtw::MqttDsn dsn, std::optional<std::string> rootTopic = std::nullopt);
-    ~TargetMqttActor();
+    ~TargetMqttActor() override;
 
     void pushCommandsTo(MqttMobilusGtwActor* actor);
     void publishDeviceState(long deviceId, std::string state);
