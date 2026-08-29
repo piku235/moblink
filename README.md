@@ -5,7 +5,6 @@ A lightweight bridge that links the **Mobilus Cosmo GTW** and a target MQTT brok
 ## Requirements
 
 * OpenSSL v3
-* Mosquitto v2.x (v1.x optionally supported)
 
 ## Overview
 
