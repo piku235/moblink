@@ -10,7 +10,7 @@ pkg_check_modules(MOSQUITTO REQUIRED IMPORTED_TARGET libmosquitto)
 
 include(cmake/CPM.cmake)
 CPMAddPackage("gh:piku235/mobgtw@0.10.0")
-CPMAddPackage("gh:cameron314/concurrentqueue@1.0.4")
+CPMAddPackage("gh:cameron314/concurrentqueue@1.0.5")
 
 set(MOBILUS_CACERT_FILE "${mobgtw_SOURCE_DIR}/certs/mobilelabs_mobilus_ca.crt")
 file(READ "${MOBILUS_CACERT_FILE}" MOBILUS_CACERT)
