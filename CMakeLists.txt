@@ -11,6 +11,27 @@ include(cmake/CPM.cmake)
 CPMAddPackage("gh:piku235/mobgtw@0.10.1")
 CPMAddPackage("gh:cameron314/concurrentqueue@1.0.5")
 
+set(WITH_TLS_PSK OFF)
+set(WITH_TESTS OFF)
+set(WITH_SOCKS OFF)
+set(WITH_WEBSOCKETS OFF)
+set(WITH_SRV OFF)
+set(WITH_STATIC_LIBRARIES ON)
+set(WITH_PIC ON)
+set(WITH_CLIENTS OFF)
+set(WITH_BROKER OFF)
+set(WITH_APPS OFF)
+set(WITH_PLUGINS OFF)
+set(DOCUMENTATION OFF)
+
+FetchContent_Declare(
+    mosquitto
+    URL https://github.com/eclipse-mosquitto/mosquitto/archive/refs/tags/v2.0.22.zip
+    EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(mosquitto)
+target_include_directories(libmosquitto_static SYSTEM INTERFACE ${mosquitto_SOURCE_DIR}/include)
+
 set(MOBILUS_CACERT_FILE "${mobgtw_SOURCE_DIR}/certs/mobilelabs_mobilus_ca.crt")
 file(READ "${MOBILUS_CACERT_FILE}" MOBILUS_CACERT)
 
@@ -39,6 +60,7 @@ target_include_directories(moblink
 
 target_link_libraries(moblink
   PRIVATE
+    libmosquitto_static
     mobgtw
     concurrentqueue
     OpenSSL::Crypto
