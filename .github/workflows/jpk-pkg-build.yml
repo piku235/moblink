@@ -11,8 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     env:
-      OPENWRT_VERSION: "24.10.3"
-      GCC_VERSION: "13.3.0"
+      OPENWRT_VERSION: "25.12.5"
+      GCC_VERSION: "14.3.0"
       MAIN_TARGET: "ramips"
       SUB_TARGET: "mt76x8"
       ARCH: "mipsel_24kc"
