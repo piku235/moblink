@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenSSL REQUIRED)
-pkg_check_modules(MOSQUITTO REQUIRED IMPORTED_TARGET libmosquitto)
 
 include(cmake/CPM.cmake)
 CPMAddPackage("gh:piku235/mobgtw@0.10.0")
@@ -43,7 +42,6 @@ target_link_libraries(moblink
     mobgtw
     concurrentqueue
     OpenSSL::Crypto
-    PkgConfig::MOSQUITTO
 )
 
 set(CPACK_GENERATOR "DEB;TGZ")
@@ -57,7 +55,7 @@ set(CPACK_PACKAGE_DESCRIPTION "A lightweight bridge that links the Mobilus Cosmo
 
 set(CPACK_DEBIAN_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
 set(CPACK_DEBIAN_PACKAGE_SECTION "net")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libmosquitto1, libssl3")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libssl3")
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/packaging/deb/postinst;${CMAKE_CURRENT_SOURCE_DIR}/packaging/deb/prerm;${CMAKE_CURRENT_SOURCE_DIR}/packaging/deb/conffiles")
 
 install(TARGETS moblink RUNTIME DESTINATION bin)
