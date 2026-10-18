@@ -8,7 +8,7 @@ find_package(PkgConfig REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 include(cmake/CPM.cmake)
-CPMAddPackage("gh:piku235/mobgtw@0.10.0")
+CPMAddPackage("gh:piku235/mobgtw@0.10.1")
 CPMAddPackage("gh:cameron314/concurrentqueue@1.0.5")
 
 set(MOBILUS_CACERT_FILE "${mobgtw_SOURCE_DIR}/certs/mobilelabs_mobilus_ca.crt")

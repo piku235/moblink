@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies on sysroot
       run: |
         sudo chroot ${{ steps.strings.outputs.sysroot-dir }} apt-get update
-        sudo chroot ${{ steps.strings.outputs.sysroot-dir }} apt-get install -y libmosquitto-dev libssl-dev
+        sudo chroot ${{ steps.strings.outputs.sysroot-dir }} apt-get install -y libssl-dev
 
     - name: Configure CMake
       run: cmake
