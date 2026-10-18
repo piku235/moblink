@@ -78,6 +78,6 @@ jobs:
           tar --owner=0 --group=0 -czf moblink.jpk -C target .
 
       - name: Upload
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: moblink.jpk
